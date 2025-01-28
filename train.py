@@ -34,12 +34,14 @@ class MazeTrainer:
             'optimizer_state_dict': self.optimizer.state_dict(),
         }, self.checkpoint_path)
 
-    def load_data(self, path="maze_dataset_128.pt"):  # Updated dataset path
-        full_dataset = torch.load(path)
-        return random_split(full_dataset, [int(0.95*len(full_dataset)), 
-                                         len(full_dataset)-int(0.95*len(full_dataset))])
+    def load_data(self, path="maze_dataset_128.pt"):
+        full_data = torch.load(path)
+        # Create TensorDataset from inputs and targets
+        dataset = torch.utils.data.TensorDataset(full_data['inputs'], full_data['targets'])
+        return random_split(dataset, [int(0.75*len(dataset)), 
+                                    len(dataset)-int(0.75*len(dataset))])
 
-    def train(self, epochs=50, batch_size=32):  # Reduced batch size for 512x512
+    def train(self, epochs, batch_size):  # Reduced batch size for 512x512
         train_set, val_set = self.load_data()
         
         train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, pin_memory=True)
